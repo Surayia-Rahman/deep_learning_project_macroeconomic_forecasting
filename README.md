@@ -1,135 +1,201 @@
-📊 Deep Learning for Macroeconomic Forecasting
+**Deep Learning for Macroeconomic Forecasting**
 
-This project implements and compares multiple deep learning and statistical models for multivariate, multi-horizon macroeconomic forecasting, with a focus on predicting inflation dynamics using U.S. economic indicators.
+This project implements and compares **custom-built deep learning architectures** (vanilla Transformer and LSTM) against **library-based models** for multivariate, multi-horizon macroeconomic forecasting, with a focus on predicting inflation dynamics using U.S. economic indicators.
 
-Overview
+---
+
+**Overview**
 
 The pipeline builds a complete forecasting system:
 
-- Retrieves macroeconomic time-series data from the FRED API
-- Applies economic transformations (log-differences, rate changes)
-- Constructs sliding window sequences for supervised learning
-- Trains multiple models (RNNs, LSTMs, Transformers, TFT, VAR)
-- Evaluates performance across forecasting horizons
+* Retrieves macroeconomic time-series data from the FRED API
+* Applies economic transformations (log-differences, rate changes)
+* Constructs sliding window sequences for supervised learning
+* Trains and compares:
+  * Custom LSTM (from scratch)
+  * Custom vanilla Transformer (from scratch)
+  * Library-based LSTM/RNN models
+  * Statistical baseline (VAR)
+* Evaluates performance across multiple forecasting horizons
 
-The primary objective is to assess whether modern deep learning architectures outperform traditional approaches in structured macroeconomic forecasting tasks.
+The primary objective is to analyze whether **custom implementations of sequence models** can match or outperform **library-optimized architectures**, and to understand trade-offs in learning dynamics, generalization, and stability in macroeconomic time-series settings.
 
-📁 Project Structure
+---
+
+**Project Structure**
+
+```bash
 deep_learning_project/
 │
-├── DL_project_macroeconomic_forecasting_final.ipynb   # Main experiment notebook
+├── DL_project_macroeconomic_forecasting_final.ipynb
 │
 ├── src/
-│   ├── data_utils.py                # Data retrieval, preprocessing, loaders
-│   ├── trainer.py                  # Training loop with early stopping
-│   ├── evaluation.py               # Metrics and evaluation logic
-│   ├── visuals.py                  # Plotting and visualization utilities
+│   ├── data_utils.py
+│   ├── trainer.py
+│   ├── evaluation.py
+│   ├── visuals.py
 │
-│   ├── model_var.py                # Vector Autoregression (baseline)
-│   ├── model_library_rnn.py        # Library-based RNN/LSTM
-│   ├── model_custom_lstm.py        # Custom LSTM implementation
-│   ├── model_custom_transformer.py # Custom Transformer model
-│   ├── model_tft.py                # Temporal Fusion Transformer (TFT)
-📦 Features
-1. Data Pipeline
-Data sourced using fredapi
-Indicators include:
-CPI (Inflation)
-Federal Funds Rate
-GDP
-Unemployment
-Industrial Production
-2. Feature Engineering
+│   ├── model_var.py
+│   ├── model_library_rnn.py
+│   ├── model_custom_lstm.py
+│   ├── model_custom_transformer.py
+│   ├── model_tft.py
+```
 
-Transforms raw macro data into stationary signals:
+---
 
-Log differences (e.g., inflation, GDP growth)
-First differences (e.g., interest rates, unemployment)
-3. Sequence Construction
-Sliding window input (default: 24 timesteps)
-Multi-step forecasting horizon (default: 6 steps ahead)
-4. Models Implemented
-VAR (baseline statistical model)
-Library LSTM/RNN
-Custom LSTM
-Custom Transformer
-Temporal Fusion Transformer (TFT)
-5. Training Framework
-PyTorch-based training loop
-MSE loss
-Gradient clipping
-Early stopping with patience
-⚙️ Installation
+**Features**
+
+**Data Pipeline**
+
+* Data is retrieved using `fredapi`
+* Macroeconomic indicators include:
+  * CPI (Inflation)
+  * Federal Funds Rate
+  * GDP
+  * Unemployment
+  * Industrial Production
+
+**Feature Engineering**
+
+* Converts raw time-series into stationary representations:
+  * Log differences for growth-based variables
+  * First differences for rate-based variables
+
+**Sequence Construction**
+
+* Sliding window input sequences (default: 24 timesteps)
+* Multi-horizon prediction targets (default: 6 steps ahead)
+
+**Models Implemented**
+
+* Custom LSTM (manual implementation using PyTorch)
+* Custom Transformer (vanilla encoder architecture)
+* Library LSTM/RNN (PyTorch built-in modules)
+* VAR (statistical baseline)
+
+**Training Framework**
+
+* PyTorch training pipeline
+* Mean Squared Error (MSE) loss
+* Gradient clipping
+* Early stopping
+
+---
+
+**Installation**
+
+```bash
 pip install pandas numpy torch scikit-learn fredapi matplotlib
-🔑 FRED API Setup
+```
+
+---
+
+**FRED API Setup**
 
 You need a FRED API key:
 
-Register at: https://fred.stlouisfed.org/
+* Register at: https://fred.stlouisfed.org/
+
 Use it in your code:
+
+```python
 from src.data_utils import get_processed_data
 
 df = get_processed_data(api_key="YOUR_API_KEY")
-▶️ How to Run
-Option 1: Notebook (Recommended)
+```
 
-Run:
+---
 
+**How to Run**
+
+**Option 1: Notebook (Recommended)**
+
+```bash
 DL_project_macroeconomic_forecasting_final.ipynb
+```
 
-This executes:
+This will execute:
 
-Data loading
-Model training
-Evaluation
-Visualization
-Option 2: Script-Based Workflow
+* Data loading
+* Preprocessing
+* Model training
+* Evaluation
+* Visualization
+
+---
+
+**Option 2: Script-Based Workflow**
+
+```python
 from src.data_utils import get_processed_data, CustomDataProcessor
 from src.trainer import train_custom_model
+```
 
-Typical flow:
+Typical workflow:
 
-Load data
-Prepare dataloaders
-Initialize model
-Train
-Evaluate
-🧠 Training Details
-Loss Function: Mean Squared Error (MSE)
-Optimizer: Adam
-Regularization:
-Gradient clipping (max_norm=1.0)
-Early stopping
-📏 Evaluation
+* Load data
+* Prepare dataloaders
+* Initialize model
+* Train
+* Evaluate
 
-Models are evaluated on:
+---
 
-Validation loss (MSE)
-Multi-horizon prediction accuracy
-Forecast stability
-📊 Key Insights
-LSTM-based models perform strongly on structured macroeconomic data
-Transformer-based models require careful tuning and may not outperform RNNs in low-sample regimes
-Classical methods (VAR) provide a strong baseline but lack flexibility for nonlinear dynamics
-⚠️ Limitations
-Limited dataset size (typical in macroeconomics)
-No exogenous covariates beyond core indicators
-Transformer/TFT models may be under-optimized
-Assumes stationarity after transformations
-🔮 Future Work
-Incorporate additional macro/financial indicators
-Hyperparameter optimization (especially for Transformers)
-Probabilistic forecasting (uncertainty quantification)
-Hybrid physics-informed or econometric models
-Real-time forecasting pipeline
-🤝 Contributing
+**Training Details**
 
-Contributions are welcome. You can:
+* Loss Function: Mean Squared Error (MSE)
+* Optimizer: Adam
+* Gradient clipping (`max_norm=1.0`)
+* Early stopping
 
-Add new models
-Improve training stability
-Extend evaluation metrics
-Optimize data preprocessing
-📜 License
+---
 
-This project is intended for academic and research use.
+**Evaluation**
+
+Models are evaluated using:
+
+* Validation loss (MSE)
+* Multi-horizon forecasting accuracy
+* Stability across prediction windows
+
+---
+
+**Key Insights**
+
+* Library LSTM models are strong baselines
+* Custom LSTM can be competitive with tuning
+* Custom Transformers are sensitive to data size and hyperparameters
+* VAR provides a useful classical benchmark
+
+---
+
+**Limitations**
+
+* Small dataset size
+* Limited hyperparameter tuning
+* Transformer underperformance in low-data regimes
+* Stationarity assumptions
+
+---
+
+**Future Work**
+
+* Better hyperparameter optimization
+* More macroeconomic indicators
+* Probabilistic forecasting
+* Hybrid econometric + deep learning models
+
+---
+
+**Contributing**
+
+* Add new models
+* Improve training pipeline
+* Extend evaluation metrics
+
+---
+
+**License**
+
+Academic and research use only.
